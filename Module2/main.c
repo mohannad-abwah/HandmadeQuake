@@ -5,12 +5,14 @@
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
 
-LRESULT CALLBACK MainWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+BOOL isRunning = TRUE;
+
+LRESULT CALLBACK mainWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
 	WNDCLASS wc = { 0 };
-	wc.lpfnWndProc = MainWndProc;
+	wc.lpfnWndProc = mainWndProc;
 	wc.hInstance = hInstance;
 	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
 	wc.lpszClassName = WINDOW_CLASS_NAME;
@@ -43,10 +45,32 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	PatBlt(deviceContext, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, BLACKNESS);
 	ReleaseDC(mainWindow, deviceContext);
 
+	MSG msg;
+	while (isRunning)
+	{
+		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+		{
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
+	}
+
 	return EXIT_SUCCESS;
 }
 
-LRESULT CALLBACK MainWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK mainWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	return DefWindowProc(hWnd, uMsg, wParam, lParam);
+	LRESULT result = 0;
+	switch (uMsg)
+	{
+		case WM_KEYUP:
+			isRunning = FALSE;
+			break;
+
+		default:
+			result = DefWindowProc(hWnd, uMsg, wParam, lParam);
+			break;
+	}
+
+	return result;
 }
