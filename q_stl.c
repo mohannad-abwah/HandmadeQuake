@@ -1,6 +1,6 @@
 #include "quakedef.h"
 
-int32 Q_strcmp(const uchar* s1, const uchar* s2)
+int32 Q_strcmp(const char* s1, const char* s2)
 {
 	while (*s1 != '\0' && *s1 == *s2) {
 		s1++;
@@ -9,7 +9,7 @@ int32 Q_strcmp(const uchar* s1, const uchar* s2)
 	return *s1 - *s2;
 }
 
-int32 Q_atoi(const uchar* str)
+int32 Q_atoi(const char* str)
 {
 	int32 sign = 1;
 	int32 val = 0;
@@ -23,7 +23,7 @@ int32 Q_atoi(const uchar* str)
 	if (*str == '0' && (*(str + 1) == 'x' || *(str + 1) == 'X')) //hex
 	{
 		str += 2;
-		uchar c;
+		char c;
 		while (*str != '\0')
 		{
 			c = *str++;
@@ -38,7 +38,7 @@ int32 Q_atoi(const uchar* str)
 	}
 	else //decimal
 	{
-		uchar c;
+		char c;
 		while (*str != '\0')
 		{
 			c = *str++;
@@ -49,13 +49,13 @@ int32 Q_atoi(const uchar* str)
 	return sign * val;
 }
 
-void Q_strcpy(uchar* dest, const uchar* src)
+void Q_strcpy(char* dest, const char* src)
 {
 	while (*dest++ = *src++)
 		;
 }
 
-void Q_strncpy(uchar* dest, const uchar* src, size_t n)
+void Q_strncpy(char* dest, const char* src, size_t n)
 {
 	while (*src != '\0' && n > 0)
 	{
@@ -70,7 +70,7 @@ void Q_strncpy(uchar* dest, const uchar* src, size_t n)
 	}
 }
 
-size_t Q_strlen(const uchar* src)
+size_t Q_strlen(const char* src)
 {
 	size_t n = 0;
 

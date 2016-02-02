@@ -3,8 +3,6 @@
 
 #include <stdio.h>
 
-void parseCmdLine(uchar *lpCmdLine);
-
 int32 CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int32 nCmdShow)
 {
 	COM_parseCmdLine(lpCmdLine);
@@ -14,20 +12,20 @@ int32 CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmd
 
 	COM_dprintf("alphaValue = %d\n", alphaValue);
 
-	return 0;
+	return EXIT_SUCCESS;
 }
 
 // declared in common.h but implementation is platform dependent
-void COM_dprintf(uchar* format, ...)
+void COM_dprintf(char* format, ...)
 {
 	va_list argptr;
 	va_start(argptr, format);
 
-	size_t n = vsnprintf(NULL, 0, format, argptr) + sizeof(uchar);
-	uchar* buffer = (uchar*)malloc(n * sizeof(uchar));
+	size_t n = vsnprintf(NULL, 0, format, argptr) + sizeof(char);
+	char* buffer = (char*)malloc(n * sizeof(char));
 
 	vsnprintf(buffer, n, format, argptr);
-	OutputDebugString(buffer);
+	OutputDebugStringA(buffer);
 
 	va_end(argptr);
 	free(buffer);
