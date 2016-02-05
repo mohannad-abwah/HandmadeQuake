@@ -2,12 +2,15 @@
 #include <stdio.h>
 
 #define WINDOW_CLASS_NAME L"Module2"
-#define WINDOW_NAME L"Lesson 2.3"
+#define WINDOW_NAME L"Lesson 2.4"
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
 
-BOOL isRunning = TRUE;
+static BOOL isRunning = TRUE;
 
+float sys_initFloatTime(void);
+float sys_floatTime(void);
+void sys_shutdown(void);
 LRESULT CALLBACK mainWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 void dprintf(char* format, ...);
@@ -48,30 +51,22 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	PatBlt(deviceContext, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, BLACKNESS);
 	ReleaseDC(mainWindow, deviceContext);
 
-	const LARGE_INTEGER frequency;
-	LARGE_INTEGER tick, tock;
 	MSG msg;
+	float startTime = sys_initFloatTime();
 
-	QueryPerformanceFrequency(&frequency);
-	QueryPerformanceCounter(&tick);
 	while (isRunning)
 	{
-		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+		while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
 		{
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
 
-		QueryPerformanceCounter(&tock);
+		float newTime = sys_floatTime();
 
-		LONGLONG interval = tock.QuadPart - tick.QuadPart;
-		double timeLapsed = (double) interval / frequency.QuadPart;
+		dprintf("Time elapsed: %3.7f\n", newTime);
 
-		dprintf("Time elapsed: %3.7f\n", timeLapsed);
-
-		QueryPerformanceCounter(&tick);
-
-		Sleep(100);
+		Sleep(1);
 	}
 
 	return EXIT_SUCCESS;
@@ -82,8 +77,14 @@ LRESULT CALLBACK mainWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	LRESULT result = 0;
 	switch (uMsg)
 	{
-		case WM_KEYUP:
-			isRunning = FALSE;
+		case WM_ACTIVATE:
+			break;
+
+		case WM_CREATE:
+			break;
+
+		case WM_DESTROY:
+			sys_shutdown();
 			break;
 
 		default:
@@ -92,6 +93,38 @@ LRESULT CALLBACK mainWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	}
 
 	return result;
+}
+
+static LONGLONG initialTimeCount;
+static double secondsPerTick;
+
+float sys_initFloatTime(void)
+{
+	LARGE_INTEGER frequency;
+	QueryPerformanceFrequency(&frequency);
+
+	secondsPerTick = 1.0 / frequency.QuadPart;
+
+	LARGE_INTEGER counter;
+	QueryPerformanceCounter(&counter);
+	initialTimeCount = counter.QuadPart;
+
+	return 0.0f;
+}
+
+float sys_floatTime(void)
+{
+	LARGE_INTEGER counter;
+	QueryPerformanceCounter(&counter);
+
+	LONGLONG interval = counter.QuadPart - initialTimeCount;
+
+	return (float) (interval * secondsPerTick);
+}
+
+void sys_shutdown(void)
+{
+	isRunning = FALSE;
 }
 
 void dprintf(char* format, ...)
