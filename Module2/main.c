@@ -1,8 +1,10 @@
 #include <Windows.h>
 #include <stdio.h>
+#include "host.h"
 
+#define TARGET_FRAMERATE 60
 #define WINDOW_CLASS_NAME L"Module2"
-#define WINDOW_NAME L"Lesson 2.4"
+#define WINDOW_NAME L"Lesson 2.5"
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
 
@@ -51,8 +53,14 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	PatBlt(deviceContext, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, BLACKNESS);
 	ReleaseDC(mainWindow, deviceContext);
 
+	host_init();
+
 	MSG msg;
-	float startTime = sys_initFloatTime();
+	float newTime, oldTime, targetTime, accumulatedTime;
+
+	targetTime = 1.f / TARGET_FRAMERATE;
+	oldTime = sys_initFloatTime();
+	accumulatedTime = 0.f;
 
 	while (isRunning)
 	{
@@ -62,12 +70,19 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 			DispatchMessage(&msg);
 		}
 
-		float newTime = sys_floatTime();
-
-		dprintf("Time elapsed: %3.7f\n", newTime);
-
-		Sleep(1);
+		newTime = sys_floatTime();
+		accumulatedTime += newTime - oldTime;
+		oldTime = newTime;
+		if (accumulatedTime > targetTime)
+		{
+			host_frame(targetTime);
+			accumulatedTime -= targetTime;
+		}
 	}
+
+	//FIXME THIS HAS A WARP-SPEED EFFECT IN THE GAME IF FRAMRATE DROPS!!!!!!!!
+
+	host_shutdown();
 
 	return EXIT_SUCCESS;
 }
