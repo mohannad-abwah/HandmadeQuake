@@ -17,7 +17,7 @@ int32 Q_atoi(const char* str)
 	if (*str == '-')
 	{
 		sign = -1;
-		*str++;
+		str++;
 	}
 
 	if (*str == '0' && (*(str + 1) == 'x' || *(str + 1) == 'X')) //hex

@@ -4,7 +4,7 @@
 
 #define TARGET_FRAMERATE 60
 #define WINDOW_CLASS_NAME L"Module2"
-#define WINDOW_NAME L"Lesson 2.5"
+#define WINDOW_NAME L"Lesson 2.6"
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
 
